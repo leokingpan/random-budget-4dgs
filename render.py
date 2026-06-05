@@ -25,6 +25,7 @@ from gaussian_renderer import GaussianModel
 from time import time
 import threading
 import concurrent.futures
+
 def multithread_write(image_list, path):
     executor = concurrent.futures.ThreadPoolExecutor(max_workers=None)
     def write_image(image, count, path):
@@ -99,15 +100,31 @@ if __name__ == "__main__":
     parser.add_argument("--iteration", default=-1, type=int)
     parser.add_argument("--skip_train", action="store_true")
     parser.add_argument("--skip_test", action="store_true")
-    parser.add_argument("--quiet", action="store_true")
+     parser.add_argument("--quiet", action="store_true")
     parser.add_argument("--skip_video", action="store_true")
     parser.add_argument("--configs", type=str)
     args = get_combined_args(parser)
-    print("Rendering " , args.model_path)
-    if args.configs:
-        import mmcv
-        from utils.params_utils import merge_hparams
-        config = mmcv.Config.fromfile(args.configs)
+
+        def _load_config_dict(path):
+            path = os.path.abspath(path)
+            basedir = os.path.dirname(path)
+            with open(path) as f:
+                src = f.read()
+            base_match = re.search(r'_base_\s*=\s*[\'"](.+?)[\'"]', src)
+            result = {}
+            if base_match:
+                base_path = os.path.join(basedir, base_match.group(1))
+                result = _load_config_dict(base_path)
+            loader = importlib.machinery.SourceFileLoader('_cfg_mod', path)
+            spec = importlib.util.spec_from_loader('_cfg_mod', loader)
+            mod = importlib.util.module_from_spec(spec)
+            loader.exec_module(mod)
+            for k, v in mod.__dict__.items():
+                if not k.startswith('_') and isinstance(v, dict):
+                    result[k] = v
+            return result
+
+        config = _load_config_dict(args.configs)
         args = merge_hparams(args, config)
     # Initialize system state (RNG)
     safe_state(args.quiet)

@@ -14,6 +14,7 @@ import os, sys
 import torch
 from random import randint
 from utils.loss_utils import l1_loss, ssim, l2_loss, lpips_loss
+from utils.mgs_utils import compute_importance, get_sorted_indices, sample_budget
 from gaussian_renderer import render, network_gui
 import sys
 from scene import Scene, GaussianModel
@@ -177,19 +178,61 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
         radii_list = []
         visibility_filter_list = []
         viewspace_point_tensor_list = []
+        
+        mgs_enabled = getattr(opt, 'mgs_enabled', False)
+        mgs_ratio = getattr(opt, 'mgs_ratio', 0.0)
+        budget_min = getattr(opt, 'budget_min', 0.1)
+        budget_max = getattr(opt, 'budget_max', 1.0)
+        is_mgs_iter = mgs_enabled and random.random() < mgs_ratio
+        if is_mgs_iter:
+            N_mgs = gaussians._xyz.shape[0]
+            mgs_loss_acc = 0.0
+        
         for viewpoint_cam in viewpoint_cams:
-            render_pkg = render(viewpoint_cam, gaussians, pipe, background, stage=stage,cam_type=scene.dataset_type)
-            image, viewspace_point_tensor, visibility_filter, radii = render_pkg["render"], render_pkg["viewspace_points"], render_pkg["visibility_filter"], render_pkg["radii"]
-            images.append(image.unsqueeze(0))
-            if scene.dataset_type!="PanopticSports":
-                gt_image = viewpoint_cam.original_image.cuda()
+            if is_mgs_iter:
+                importance = compute_importance(gaussians, viewpoint_cam)
+                sorted_idx = get_sorted_indices(importance)
+                K = sample_budget(N_mgs, budget_min, budget_max)
+                sub = gaussians.subset_view(sorted_idx[:K])
+                
+                render_pkg_prefix = render(viewpoint_cam, sub, pipe, background, stage=stage, cam_type=scene.dataset_type)
+                image_prefix = render_pkg_prefix["render"]
+                
+                render_pkg = render(viewpoint_cam, gaussians, pipe, background, stage=stage, cam_type=scene.dataset_type)
+                image, viewspace_point_tensor, visibility_filter, radii = render_pkg["render"], render_pkg["viewspace_points"], render_pkg["visibility_filter"], render_pkg["radii"]
+                
+                if scene.dataset_type != "PanopticSports":
+                    gt_image = viewpoint_cam.original_image.cuda()
+                else:
+                    gt_image = viewpoint_cam['image'].cuda()
+                gt_rgb = gt_image[:3]
+                
+                images.append(image.unsqueeze(0))
+                gt_images.append(gt_image.unsqueeze(0))
+                radii_list.append(radii.unsqueeze(0))
+                visibility_filter_list.append(visibility_filter.unsqueeze(0))
+                viewspace_point_tensor_list.append(viewspace_point_tensor)
+                
+                Ll1_prefix = l1_loss(image_prefix, gt_rgb)
+                Ll1_full = l1_loss(image, gt_rgb)
+                fw = getattr(opt, 'mgs_full_weight', 1.0)
+                cam_mgs_loss = (1.0 - opt.lambda_dssim) * (Ll1_prefix + fw * Ll1_full)
+                if opt.lambda_dssim != 0:
+                    cam_mgs_loss += opt.lambda_dssim * ((1.0 - ssim(image_prefix.unsqueeze(0), gt_rgb.unsqueeze(0))) + (1.0 - ssim(image.unsqueeze(0), gt_rgb.unsqueeze(0))))
+                mgs_loss_acc = mgs_loss_acc + cam_mgs_loss
             else:
-                gt_image  = viewpoint_cam['image'].cuda()
-            
-            gt_images.append(gt_image.unsqueeze(0))
-            radii_list.append(radii.unsqueeze(0))
-            visibility_filter_list.append(visibility_filter.unsqueeze(0))
-            viewspace_point_tensor_list.append(viewspace_point_tensor)
+                render_pkg = render(viewpoint_cam, gaussians, pipe, background, stage=stage,cam_type=scene.dataset_type)
+                image, viewspace_point_tensor, visibility_filter, radii = render_pkg["render"], render_pkg["viewspace_points"], render_pkg["visibility_filter"], render_pkg["radii"]
+                images.append(image.unsqueeze(0))
+                if scene.dataset_type!="PanopticSports":
+                    gt_image = viewpoint_cam.original_image.cuda()
+                else:
+                    gt_image  = viewpoint_cam['image'].cuda()
+                
+                gt_images.append(gt_image.unsqueeze(0))
+                radii_list.append(radii.unsqueeze(0))
+                visibility_filter_list.append(visibility_filter.unsqueeze(0))
+                viewspace_point_tensor_list.append(viewspace_point_tensor)
         
 
         radii = torch.cat(radii_list,0).max(dim=0).values
@@ -204,14 +247,20 @@ def scene_reconstruction(dataset, opt, hyper, pipe, testing_iterations, saving_i
         # norm
         
 
-        loss = Ll1
-        if stage == "fine" and hyper.time_smoothness_weight != 0:
-            # tv_loss = 0
-            tv_loss = gaussians.compute_regulation(hyper.time_smoothness_weight, hyper.l1_time_planes, hyper.plane_tv_weight)
-            loss += tv_loss
-        if opt.lambda_dssim != 0:
-            ssim_loss = ssim(image_tensor,gt_image_tensor)
-            loss += opt.lambda_dssim * (1.0-ssim_loss)
+        if is_mgs_iter:
+            loss = mgs_loss_acc
+            if stage == "fine" and hyper.time_smoothness_weight != 0:
+                tv_loss = gaussians.compute_regulation(hyper.time_smoothness_weight, hyper.l1_time_planes, hyper.plane_tv_weight)
+                loss += tv_loss
+        else:
+            loss = Ll1
+            if stage == "fine" and hyper.time_smoothness_weight != 0:
+                # tv_loss = 0
+                tv_loss = gaussians.compute_regulation(hyper.time_smoothness_weight, hyper.l1_time_planes, hyper.plane_tv_weight)
+                loss += tv_loss
+            if opt.lambda_dssim != 0:
+                ssim_loss = ssim(image_tensor,gt_image_tensor)
+                loss += opt.lambda_dssim * (1.0-ssim_loss)
         # if opt.lambda_lpips !=0:
         #     lpipsloss = lpips_loss(image_tensor,gt_image_tensor,lpips_model)
         #     loss += opt.lambda_lpips * lpipsloss
@@ -410,14 +459,47 @@ if __name__ == "__main__":
     parser.add_argument("--start_checkpoint", type=str, default = None)
     parser.add_argument("--expname", type=str, default = "")
     parser.add_argument("--configs", type=str, default = "")
+    parser.add_argument('--mgs_enabled', action='store_true', default=False)
+    parser.add_argument('--mgs_ratio', type=float, default=0.0)
+    parser.add_argument('--budget_min', type=float, default=0.1)
+    parser.add_argument('--budget_max', type=float, default=1.0)
+    parser.add_argument('--mgs_full_weight', type=float, default=1.0,
+                        help='Weight for full-res loss term in MGS training (0=prefix only, 1=equal, 2=strong full)')
     
     args = parser.parse_args(sys.argv[1:])
     args.save_iterations.append(args.iterations)
     if args.configs:
-        import mmcv
+        import importlib.util, importlib.machinery, os, re
         from utils.params_utils import merge_hparams
-        config = mmcv.Config.fromfile(args.configs)
+
+        def _load_config_dict(path):
+            path = os.path.abspath(path)
+            basedir = os.path.dirname(path)
+            with open(path) as f:
+                src = f.read()
+            base_match = re.search(r'_base_\s*=\s*[\'"](.+?)[\'"]', src)
+            result = {}
+            if base_match:
+                base_path = os.path.join(basedir, base_match.group(1))
+                result = _load_config_dict(base_path)
+            loader = importlib.machinery.SourceFileLoader('_cfg_mod', path)
+            spec = importlib.util.spec_from_loader('_cfg_mod', loader)
+            mod = importlib.util.module_from_spec(spec)
+            loader.exec_module(mod)
+            for k, v in mod.__dict__.items():
+                if not k.startswith('_'):
+                    if isinstance(v, dict):
+                        result[k] = v
+                    else:
+                        result.setdefault('_scalars', {})[k] = v
+            return result
+
+        config = _load_config_dict(args.configs)
         args = merge_hparams(args, config)
+        if '_scalars' in config:
+            for key, value in config['_scalars'].items():
+                if hasattr(args, key):
+                    setattr(args, key, value)
     print("Optimizing " + args.model_path)
 
     # Initialize system state (RNG)
@@ -426,7 +508,13 @@ if __name__ == "__main__":
     # Start GUI server, configure and run training
     network_gui.init(args.ip, args.port)
     torch.autograd.set_detect_anomaly(args.detect_anomaly)
-    training(lp.extract(args), hp.extract(args), op.extract(args), pp.extract(args), args.test_iterations, args.save_iterations, args.checkpoint_iterations, args.start_checkpoint, args.debug_from, args.expname)
+    opt = op.extract(args)
+    opt.mgs_enabled = getattr(args, 'mgs_enabled', False)
+    opt.mgs_ratio = getattr(args, 'mgs_ratio', 0.0)
+    opt.budget_min = getattr(args, 'budget_min', 0.1)
+    opt.budget_max = getattr(args, 'budget_max', 1.0)
+    opt.mgs_full_weight = getattr(args, 'mgs_full_weight', 1.0)
+    training(lp.extract(args), hp.extract(args), opt, pp.extract(args), args.test_iterations, args.save_iterations, args.checkpoint_iterations, args.start_checkpoint, args.debug_from, args.expname)
 
     # All done
     print("\nTraining complete.")

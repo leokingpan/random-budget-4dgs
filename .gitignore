@@ -9,3 +9,36 @@ screenshots
 data/
 data
 submodules/
+.omo/
+
+# Paper compilation artifacts
+paper/**/*.aux
+paper/**/*.bbl
+paper/**/*.blg
+paper/**/*.out
+paper/**/*.log
+paper/**/*.synctex*
+paper/**/*.dvi
+paper/**/*.4ct
+paper/**/*.4tc
+paper/**/*.css
+paper/**/*.html
+paper/**/*.idv
+paper/**/*.lg
+paper/**/*.tmp
+paper/**/*.xref
+paper/**/*.png
+
+# Windows artifacts
+*Zone.Identifier
+
+# Videos (too large for git)
+*.mp4
+paper/TVC/new/
+paper/TVC/evidence/
+.ipynb_checkpoints/
+*.ipynb
+*.mp4
+*.mp4
+*.zip
+paper/TVC/*.pdf

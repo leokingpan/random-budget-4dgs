@@ -1,0 +1,1 @@
+/usr/share/texlive/texmf-dist/bibtex/bst/llncs/splncs04.bst

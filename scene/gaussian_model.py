@@ -23,7 +23,7 @@ from simple_knn._C import distCUDA2
 from utils.graphics_utils import BasicPointCloud
 from utils.general_utils import strip_symmetric, build_scaling_rotation
 from scene.deformation import deform_network
-from scene.regulation import compute_plane_smoothness
+from scene.regulation import compute_plane_smoothness, compute_plane_tv
 class GaussianModel:
 
     def setup_functions(self):
@@ -129,6 +129,43 @@ class GaussianModel:
     
     def get_covariance(self, scaling_modifier = 1):
         return self.covariance_activation(self.get_scaling, scaling_modifier, self._rotation)
+
+    def subset_view(self, indices: torch.Tensor):
+        n = int(indices.shape[0])
+
+        GaussianView = type('GaussianView', (), {
+            '__len__': lambda s: s._n,
+            'get_xyz':       property(lambda s: s._xyz),
+            'get_scaling':   property(lambda s: s.scaling_activation(s._scaling)),
+            'get_rotation':  property(lambda s: s.rotation_activation(s._rotation)),
+            'get_opacity':   property(lambda s: s.opacity_activation(s._opacity)),
+            'get_features':  property(lambda s: torch.cat((s._features_dc, s._features_rest), dim=1)),
+            'get_covariance': lambda s, scaling_modifier=1: s.covariance_activation(
+                s.get_scaling, scaling_modifier, s._rotation),
+        })
+
+        view = GaussianView()
+        view._n = n
+
+        view._xyz               = self._xyz[indices]
+        view._features_dc       = self._features_dc[indices]
+        view._features_rest     = self._features_rest[indices]
+        view._scaling           = self._scaling[indices]
+        view._rotation          = self._rotation[indices]
+        view._opacity           = self._opacity[indices]
+        view._deformation_table = self._deformation_table[indices.to(self._deformation_table.device)]
+
+        view._deformation        = self._deformation
+        view.active_sh_degree    = self.active_sh_degree
+        view.max_sh_degree       = self.max_sh_degree
+        view.scaling_activation  = self.scaling_activation
+        view.rotation_activation = self.rotation_activation
+        view.opacity_activation  = self.opacity_activation
+        view.covariance_activation = self.covariance_activation
+
+        view.max_radii2D = torch.zeros(n, device=self._xyz.device)
+
+        return view
 
     def oneupSHdegree(self):
         if self.active_sh_degree < self.max_sh_degree:
@@ -333,6 +370,8 @@ class GaussianModel:
         for group in self.optimizer.param_groups:
             if len(group["params"]) > 1:
                 continue
+            if len(group["params"]) == 0:
+                continue
             stored_state = self.optimizer.state.get(group['params'][0], None)
             if stored_state is not None:
                 stored_state["exp_avg"] = stored_state["exp_avg"][mask]
@@ -368,6 +407,7 @@ class GaussianModel:
         optimizable_tensors = {}
         for group in self.optimizer.param_groups:
             if len(group["params"])>1:continue
+            if len(group["params"]) == 0:continue
             assert len(group["params"]) == 1
             extension_tensor = tensors_dict[group["name"]]
             stored_state = self.optimizer.state.get(group['params'][0], None)
@@ -541,11 +581,13 @@ class GaussianModel:
         # model.grids is 6 x [1, rank * F_dim, reso, reso]
         for grids in multi_res_grids:
             if len(grids) == 3:
-                time_grids = []
+                time_grids = [0, 1, 2]
+                for grid_id in time_grids:
+                    total += compute_plane_tv(grids[grid_id])
             else:
-                time_grids =  [0,1,3]
-            for grid_id in time_grids:
-                total += compute_plane_smoothness(grids[grid_id])
+                time_grids = [0, 1, 3]
+                for grid_id in time_grids:
+                    total += compute_plane_smoothness(grids[grid_id])
         return total
     def _time_regulation(self):
         multi_res_grids = self._deformation.deformation_net.grid.grids
