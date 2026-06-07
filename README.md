@@ -1,13 +1,15 @@
 # Random Budget Training for Variable-Budget Rendering in 4D Gaussian Splatting
 
-### [arXiv Paper]() | [Project Page]()
+### [Paper (TVC)]() | [Code](https://github.com/leokingpan/random-budget-4dgs)
 
-[Guangzi Zhang](https://github.com/leokingpan)<sup>2</sup>, [Yulong Pan](https://github.com/leokingpan)<sup>1</sup>, [Xingquan Cai](https://github.com/leokingpan)<sup>2*</sup>
+[Guangzi Zhang](https://github.com/leokingpan)<sup>1,2,3</sup>, [Yulong Pan](https://github.com/leokingpan)<sup>1,2</sup>, [Xingquan Cai](https://github.com/leokingpan)<sup>1,2,4\*</sup>
 
-<sup>1</sup> Beijing Key Laboratory of Cross-Modal Intelligent Immersive Computing, NCUT &emsp;
-<sup>2</sup> School of Artificial Intelligence and Computer Science, NCUT
+<sup>1</sup> Beijing Key Laboratory of Cross-Modal Intelligent Immersive Computing, North China University of Technology, Beijing 100144, China  
+<sup>2</sup> School of Artificial Intelligence and Computer Science, North China University of Technology, Beijing 100144, China  
+<sup>3</sup> Communication University of China, Beijing 100024, China  
+<sup>4</sup> Beijing Institute of Technology, Beijing 100081, China  
 
-<sup>\*</sup> Corresponding Author.
+<sup>\*</sup> Corresponding author: caixingquan@ncut.edu.cn
 
 ---
 
@@ -17,7 +19,7 @@
 
 ## Abstract
 
-4D Gaussian Splatting (4DGS) produces high-quality dynamic novel views but uses a fixed number of primitives, making it hard to adapt to different hardware budgets. We introduce **random budget training**: during training, the model repeatedly renders with randomly sampled primitive subsets ordered by a deformation-aware importance score. At inference, a user simply truncates the sorted Gaussian sequence to the desired budget. On 9 dynamic scenes (D-NeRF + NeRF-DS), our method improves PSNR by **+2.0 dB** over post-hoc pruning at 25% budget, while boosting FPS from 78 to 114. No extra parameters, no extra memory.
+4D Gaussian Splatting (4DGS) produces high-quality dynamic novel views but uses a fixed number of primitives, making it hard to adapt to different hardware budgets. We introduce **random budget training**: during training, the model repeatedly renders with randomly sampled primitive subsets ordered by a deformation-aware importance score. At inference, a user simply truncates the sorted Gaussian sequence to the desired budget. On 9 dynamic scenes (7 D-NeRF + 2 NeRF-DS), our method improves PSNR by **+2.3 dB** over post-hoc pruning at 25% budget, reaching 33.63 dB PSNR and 131.7 FPS on D-NeRF scenes. Full-budget quality degrades by only 0.57 dB on average. No extra parameters, no extra memory, one model serves all budgets.
 
 ## Installation
 
@@ -113,13 +115,44 @@ python eval_all.py --method mgs
 | press (real) | 20.33 | **22.34** | +2.0 |
 | **Average** | 28.53 | **30.58** | **+2.0** |
 
-### Rendering Speed (FPS)
+### Rendering Speed (FPS, 7 D-NeRF avg)
 
 | Budget | 10% | 25% | 50% | 75% | 100% |
 |--------|:---:|:---:|:---:|:---:|:---:|
-| Avg FPS | 105.2 | **114.4** | 99.8 | 91.7 | 78.0 |
+| Avg PSNR | 29.48 | **33.63** | 34.75 | 34.95 | 35.02 |
+| Avg FPS | 119.2 | **131.7** | 118.3 | 101.5 | 89.7 |
 
-Reducing budget from 100% → 25% gives **47% speedup** with +2.0 dB quality gain over post-hoc pruning.
+25% budget gives the highest FPS (1.47× over full budget) while maintaining 33.63 dB PSNR.
+
+## Experiments
+
+Reproduce all paper experiments:
+
+```bash
+# Exp 1: Static ordering evaluation
+bash run_exp1_evaluations.sh
+
+# Exp 2: Importance score ablation (5 variants × 5 scenes)
+bash run_exp2_ablation.sh
+
+# Exp 3: Press failure analysis (appearance-aware score)
+bash run_exp3_quick.sh
+
+# Exp 4: Post-hoc pruning + fine-tuning baseline
+bash run_exp4_posthoc_ft.sh
+
+# Exp 6: Multi-seed stability
+bash run_exp6_multiseed.sh
+
+# Exp 7: Budget sampling hyperparameter sensitivity
+bash run_exp7_clean.sh
+
+# Generate paper figures
+python gen_paper_figures.py
+
+# Compile all results
+python synthesize_all.py
+```
 
 ## Method Overview
 
@@ -144,7 +177,7 @@ Inference:
 @article{zhang2026randombudget,
   title     = {Random Budget Training for Variable-Budget Rendering in 4D Gaussian Splatting},
   author    = {Zhang, Guangzi and Pan, Yulong and Cai, Xingquan},
-  journal   = {arXiv preprint},
+  journal   = {The Visual Computer (under review)},
   year      = {2026},
 }
 ```
