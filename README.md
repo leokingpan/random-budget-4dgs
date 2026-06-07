@@ -2,7 +2,7 @@
 
 ### [arXiv Paper]() | [Project Page]()
 
-[Guangzi Zhang](https://github.com/leokingpan)<sup>1,2*</sup>, [Yulong Pan](https://github.com/leokingpan)<sup>2</sup>, [Xingquan Cai](https://github.com/leokingpan)<sup>2</sup>
+[Guangzi Zhang](https://github.com/leokingpan)<sup>2</sup>, [Yulong Pan](https://github.com/leokingpan)<sup>1</sup>, [Xingquan Cai](https://github.com/leokingpan)<sup>2*</sup>
 
 <sup>1</sup> Beijing Key Laboratory of Cross-Modal Intelligent Immersive Computing, NCUT &emsp;
 <sup>2</sup> School of Artificial Intelligence and Computer Science, NCUT

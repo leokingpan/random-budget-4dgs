@@ -56,6 +56,9 @@ from utils.mgs_utils import (
     compute_importance,
     get_sorted_indices,
     compute_opacity_only,
+    compute_canonical_opacity,
+    compute_importance_projected_area,
+    compute_importance_appearance_aware,
 )
 
 _lpips_model = None
@@ -107,11 +110,17 @@ def build_argparse() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--ordering", type=str, default="ours",
-        choices=["ours", "random", "posthoc_opacity"],
+        choices=["ours", "random", "posthoc_opacity",
+                 "opacity", "opacity_area",
+                 "canonical_opacity", "projected_area",
+                 "appearance_aware"],
         help=("Gaussian ordering strategy (default: ours). "
-              "ours: importance = deformed_opacity × projected_area. "
+              "ours/opacity_area: deformed_opacity × scale-area. "
               "random: uniformly random permutation. "
-              "posthoc_opacity: deformed opacity only, no area weighting.")
+              "posthoc_opacity/opacity: deformed opacity only. "
+              "canonical_opacity: raw pre-deformation opacity. "
+              "projected_area: deformed opacity × projected 2D covariance area. "
+              "appearance_aware: opacity × area × (1+γ·SH_energy).")
     )
     parser.add_argument(
         "--static", action="store_true",
@@ -294,9 +303,15 @@ def get_sorted_indices_for_ordering(
     if ordering == "random":
         return torch.randperm(N, device="cuda")
 
-    if ordering == "posthoc_opacity":
+    if ordering == "posthoc_opacity" or ordering == "opacity":
         importance = compute_opacity_only(gaussians, cam)
-    else:  # "ours"
+    elif ordering == "canonical_opacity":
+        importance = compute_canonical_opacity(gaussians, cam)
+    elif ordering == "projected_area":
+        importance = compute_importance_projected_area(gaussians, cam)
+    elif ordering == "appearance_aware":
+        importance = compute_importance_appearance_aware(gaussians, cam)
+    else:  # "ours" or "opacity_area"
         importance = compute_importance(gaussians, cam)
 
     return get_sorted_indices(importance, descending=True)
