@@ -2,7 +2,7 @@
 
 ### [Paper (TVC)]() | [Code](https://github.com/leokingpan/random-budget-4dgs)
 
-[Guangzi Zhang](https://github.com/leokingpan)<sup>1,2,3</sup>, [Yulong Pan](https://github.com/leokingpan)<sup>1,2</sup>, [Xingquan Cai](https://github.com/leokingpan)<sup>1,2,4\*</sup>
+[Zhang G.](https://github.com/leokingpan)<sup>1,2,3</sup>, [Pan Y.](https://github.com/leokingpan)<sup>1,2</sup>, [Cai X.](https://github.com/leokingpan)<sup>1,2,4\*</sup>
 
 <sup>1</sup> Beijing Key Laboratory of Cross-Modal Intelligent Immersive Computing, North China University of Technology, Beijing 100144, China  
 <sup>2</sup> School of Artificial Intelligence and Computer Science, North China University of Technology, Beijing 100144, China  
@@ -176,7 +176,7 @@ Inference:
 ```bibtex
 @article{zhang2026randombudget,
   title     = {Random Budget Training for Variable-Budget Rendering in 4D Gaussian Splatting},
-  author    = {Zhang, Guangzi and Pan, Yulong and Cai, Xingquan},
+  author    = {Zhang, G. and Pan, Y. and Cai, X.},
   journal   = {The Visual Computer (under review)},
   year      = {2026},
 }
