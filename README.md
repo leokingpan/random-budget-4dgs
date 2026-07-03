@@ -21,7 +21,7 @@
 
 ## Abstract
 
-4D Gaussian Splatting (4DGS) produces high-quality dynamic novel views but uses a fixed number of primitives, making it hard to adapt to different hardware budgets. We introduce **random budget training**: during training, the model repeatedly renders with randomly sampled primitive subsets ordered by a deformation-aware importance score. At inference, a user simply truncates the sorted Gaussian sequence to the desired budget. On 9 dynamic scenes (7 D-NeRF + 2 NeRF-DS), our method improves PSNR by **+2.3 dB** over post-hoc pruning at 25% budget, reaching 33.63 dB PSNR and 131.7 FPS on D-NeRF scenes. Full-budget quality degrades by only 0.57 dB on average. No extra parameters, no extra memory, one model serves all budgets.
+4D Gaussian Splatting (4DGS) produces high-quality dynamic novel views but uses a fixed number of primitives, making it hard to adapt to different hardware budgets. We introduce **random budget training**: during training, the model repeatedly renders with randomly sampled primitive subsets ordered by a deformation-aware importance score. At inference, a user simply truncates the sorted Gaussian sequence to the desired budget. On 9 dynamic scenes (7 D-NeRF + 2 NeRF-DS), our method improves the average 25% budget PSNR from 28.53 dB to 30.70 dB over post-hoc pruning, with an average gain of **+2.17 dB**. At 25% budget, D-NeRF scenes reach 33.63 dB PSNR and 131.7 FPS on average. Full-budget quality degrades by only 0.57 dB on average. No extra parameters, no extra memory, one model serves all budgets.
 
 ## Installation
 
@@ -30,7 +30,7 @@ Based on [4DGaussians](https://github.com/hustvl/4DGaussians) (CVPR 2024) and [3
 ```bash
 git clone https://github.com/leokingpan/random-budget-4dgs.git --recursive
 cd random-budget-4dgs
-conda create -n Gaussians4D python=3.8
+conda create -n Gaussians4D python=3.10
 conda activate Gaussians4D
 
 pip install -r requirements.txt
@@ -80,7 +80,7 @@ python train.py -s data/dnerf/bouncingballs --port 6020 \
 Key training parameters (in `configs/mgs_4dgs.py`):
 - `mgs_ratio`: probability of entering budget branch (0.5)
 - `budget_min` / `budget_max`: budget sampling range (0.1–1.0)
-- `mgs_full_weight`: full-set loss weight (0.0 for prefix-only loss)
+- `mgs_full_weight`: full-set loss weight (default 1.0)
 
 ### Per-Budget Baselines
 ```bash
@@ -114,8 +114,8 @@ python eval_all.py --method mgs
 | hook | 29.79 | **31.57** | +1.8 |
 | hellwarrior | 26.08 | **28.06** | +2.0 |
 | plate (real) | 15.82 | **17.10** | +1.3 |
-| press (real) | 20.33 | **22.34** | +2.0 |
-| **Average** | 28.53 | **30.58** | **+2.0** |
+| press (real) | 20.33 | **23.47** | +3.1 |
+| **Average** | 28.53 | **30.70** | **+2.17** |
 
 ### Rendering Speed (FPS, 7 D-NeRF avg)
 
@@ -131,23 +131,26 @@ python eval_all.py --method mgs
 Reproduce all paper experiments:
 
 ```bash
-# Exp 1: Static ordering evaluation
-bash run_exp1_evaluations.sh
+# Random seed stability (Exp 1)
+bash run_seed_stability.sh
 
-# Exp 2: Importance score ablation (5 variants × 5 scenes)
-bash run_exp2_ablation.sh
+# Training & inference overhead (Exp 2)
+python measure_overhead.py --checkpoint output/dnerf/bouncingballs_mgs
 
-# Exp 3: Press failure analysis (appearance-aware score)
-bash run_exp3_quick.sh
+# Post-hoc pruning + fine-tuning (Exp 3)
+python train_posthoc_ft.py --checkpoint output/dnerf/bouncingballs_baseline --budget 0.25 --ft_iters 3000 --expname posthoc_ft_b25
 
-# Exp 4: Post-hoc pruning + fine-tuning baseline
-bash run_exp4_posthoc_ft.sh
+# Temporal consistency (Exp 4)
+python temporal_consistency.py --checkpoint output/dnerf/jumpingjacks_mgs --budgets 0.1,0.25
 
-# Exp 6: Multi-seed stability
-bash run_exp6_multiseed.sh
+# Appearance-aware ranking (Exp 5)
+python render_mgs.py --checkpoint output/nerfds/press_mgs --budgets 0.1,0.25,0.5,1.0 --ordering appearance_aware
 
-# Exp 7: Budget sampling hyperparameter sensitivity
-bash run_exp7_clean.sh
+# Static vs adaptive ordering (Exp 6)
+python render_mgs.py --checkpoint output/dnerf/jumpingjacks_mgs --budgets 0.1,0.25 --static
+
+# Runtime budget switching (Exp 7)
+python run_budget_switch.py --checkpoint output/dnerf/jumpingjacks_mgs
 
 # Generate paper figures
 python gen_paper_figures.py
@@ -155,6 +158,8 @@ python gen_paper_figures.py
 # Compile all results
 python synthesize_all.py
 ```
+
+> **Note on seed stability**: The seed-stability experiment was retrained on RTX 3090 for revision. The main comparison tables use the original RTX 4080 checkpoints. Therefore, the absolute PSNR values in the seed-stability table should not be directly compared with the main tables; the focus is the standard deviation across seeds.
 
 ## Method Overview
 

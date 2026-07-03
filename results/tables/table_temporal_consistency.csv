@@ -1,0 +1,9 @@
+Scene,Method,Budget,Frame-PSNR,T-PSNR,T-L1
+jumpingjacks,Ours,10%,30.13,16.87,0.042
+jumpingjacks,Post-hoc,10%,19.18,18.73,0.029
+jumpingjacks,Ours,25%,33.67,16.66,0.043
+jumpingjacks,Post-hoc,25%,25.26,16.85,0.042
+mutant,Ours,10%,29.87,12.51,0.084
+mutant,Post-hoc,10%,17.38,13.96,0.067
+mutant,Ours,25%,35.10,12.44,0.085
+mutant,Post-hoc,25%,26.21,12.26,0.086

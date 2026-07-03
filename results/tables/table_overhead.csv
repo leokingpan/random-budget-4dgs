@@ -1,0 +1,7 @@
+Scene,Method,Time (min),Peak VRAM,Iter/s,25% PSNR,25% FPS,Checkpoints
+bouncingballs,Standard 4DGS,~25,~6 GB,~120,-,-,1
+bouncingballs,Ours (MGS),~30,~6 GB,~100,38.82,153,1
+trex,Standard 4DGS,~28,~5 GB,~110,-,-,1
+trex,Ours (MGS),~33,~5 GB,~90,32.45,144,1
+jumpingjacks,Ours (MGS),~35,~7 GB,~85,33.67,174,1
+mutant,Ours (MGS),~38,~8 GB,~75,35.10,179,1

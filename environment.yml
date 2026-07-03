@@ -1,0 +1,25 @@
+name: rbt4dgs
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - cuda-nvcc=12.1.105
+  - cuda-cudart-dev=12.1.105
+  - gxx_linux-64  # Linux only; Windows users install Visual Studio Build Tools
+  - pip:
+    - torch==2.5.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+    - torchvision==0.20.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+    - matplotlib
+    - lpips
+    - plyfile
+    - pytorch_msssim
+    - open3d
+    - "imageio[ffmpeg]"
+    - opencv-python
+    - pillow<11
+    - -e submodules/depth-diff-gaussian-rasterization
+    - -e submodules/simple-knn

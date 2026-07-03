@@ -1,0 +1,5 @@
+Scene,Budget,PSNR,PSNR Loss vs 100%,FPS,Speedup vs 100%
+jumpingjacks,100%,34.49,-,95,1.0x
+jumpingjacks,50%,34.40,0.09,158,1.7x
+jumpingjacks,25%,33.67,0.82,201,2.1x
+jumpingjacks,10%,30.13,4.36,209,2.2x
