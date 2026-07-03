@@ -1,0 +1,7 @@
+--index-url https://download.pytorch.org/whl/cu121
+torch==2.5.1+cu121
+torchvision==0.20.1+cu121
+
+# Install CUDA submodules (after PyTorch is installed):
+# pip install -e submodules/depth-diff-gaussian-rasterization --no-build-isolation
+# pip install -e submodules/simple-knn --no-build-isolation

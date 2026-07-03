@@ -30,12 +30,17 @@ Based on [4DGaussians](https://github.com/hustvl/4DGaussians) (CVPR 2024) and [3
 ```bash
 git clone https://github.com/leokingpan/random-budget-4dgs.git --recursive
 cd random-budget-4dgs
-conda create -n Gaussians4D python=3.10
-conda activate Gaussians4D
 
-pip install -r requirements.txt
-pip install -e submodules/depth-diff-gaussian-rasterization
-pip install -e submodules/simple-knn
+# Create conda environment
+conda env create -f environment.yml
+conda activate rbt4dgs
+
+# Install PyTorch with CUDA support
+pip install -r requirements-cu121.txt
+
+# Install CUDA submodules
+pip install -e submodules/depth-diff-gaussian-rasterization --no-build-isolation
+pip install -e submodules/simple-knn --no-build-isolation
 ```
 
 Tested with PyTorch 2.5.1 + CUDA 12.1 on RTX 4080 SUPER.
