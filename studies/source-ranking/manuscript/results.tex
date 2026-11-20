@@ -1,0 +1,150 @@
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{Evaluation protocol}
+\label{sec:setup}
+The main evaluation uses Chicken (HyperNeRF VRIG~\cite{park2021hypernerf}), Cut Roasted Beef and Sear Steak (DyNeRF/N3DV~\cite{li2022neuralvideo}), and Basin (NeRF-DS~\cite{yan2023nerf}). We use three existing source checkpoints per scene. The evaluation uses the test split at the resolutions available in the records: $268\times480$ for Chicken (164 frames), $480\times360$ for Cut and Sear (300 frames each), and $240\times135$ for Basin (668 frames). These scenes and test views had been examined in earlier experiments. The three checkpoint replicates quantify sensitivity within each scene under this protocol.
+
+For each source and nominal retained fraction, O, P, C and U have identical integer capacity $K$ and use identical test cameras. At each working point we average raw PSNR over frames within each checkpoint, then report the scene mean and sample standard deviation over the three checkpoint values. Paired differences compare methods within each checkpoint before aggregation. All quality cells contain PSNR. Each auxiliary metric (SSIM and LPIPS) is missing for 46 archived Basin cells: ten at 10\% retention and twelve each at 15, 20 and 35\%. We leave these entries missing. At the newly examined 10\% and 20\% budgets, the 96 cold cells include 63 new renders, 24 archived Basin measurements and nine exact membership matches at 10\% (P and O). The 13-scene fine-tuning comparison and the fixed-capacity controls below use independent protocols and are reported separately.
+
+\input{source_effect}
+\subsection{Budget dependence before fine-tuning}
+\label{sec:cold}
+Table~\ref{tab:cold} and Fig.~\ref{fig:budget} report the same 240 quality cells across five budgets. At 10\%, C improves on opacity ranking (O) by 5.14~dB on Chicken, 2.26~dB on Cut and 1.55~dB on Sear, with improvements above 1~dB for every checkpoint from those three scenes. The respective differences at 15\% are 2.35, 1.85 and 1.06~dB, and at 20\% they narrow to 1.35, 1.45 and 0.76~dB. Basin has a smaller response throughout, with 0.11 and 0.09~dB gains at 10 and 15\%. The absolute values show that the small Basin gain occurs around 19.5~dB in this evaluation.
+
+Comparing C with U isolates the opacity candidate restriction for the same analytic score. At both 10 and 15\%, C scores higher for all nine checkpoints from Chicken, Cut and Sear. At 20\%, C is ahead for two of nine checkpoints, and at 25 and 35\%, U is ahead for all nine. Basin differences between these variants are negligible. P and O select the same members at 10\% because P protects the opacity core at that budget. The separate score comparison in Table~\ref{tab:scorebridge} evaluates historical rankings under a common core and candidate band at 25\%.
+
+\begin{table*}[t]
+\centering\small
+\caption{Cold PSNR (dB), mean $\pm$ sample standard deviation across the three source checkpoints per scene. All four arms share the same sources, test frames and retained count for each budget.}
+\label{tab:cold}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrcccc}
+\hline
+Scene & Budget (\%) & O & P & C & U \\
+\hline
+\resultrows{results_assets/cold.tex}
+\hline
+\end{tabular}}
+\end{table*}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.86\textwidth]{results_assets/budget.pdf}
+\caption{Cold PSNR by retained fraction using the measurements in Table~\ref{tab:cold}. Error bars show one sample standard deviation across three checkpoints. The vertical scale varies by scene.}
+\label{fig:budget}
+\end{figure*}
+
+\subsection{Ranking choice after matched fine-tuning at 15\%}
+\label{sec:finetune}
+For every source and ranking, we materialize the selected members at 15\% and apply 2,000 optimizer updates using common optimizer settings and the same training-camera schedule. Each run uses Adam to minimize $0.8L_1+0.2(1-\mathrm{SSIM})$ on training images, updating the retained point parameters and trainable deformation parameters. The endpoint is fixed in advance and test PSNR plays no part in choosing it. The membership remains fixed, with densification and member replacement disabled. The step-zero evaluations reproduce the archived cold per-frame PSNR with a maximum absolute deviation of $7.11\times10^{-15}$~dB. Table~\ref{tab:finetune} reports the fixed step-2,000 endpoint. Opacity subsets also benefit from the matched adaptation. The C--O gap remains positive for every Chicken, Cut and Sear checkpoint and exceeds 1~dB in all six Chicken and Cut pairs. U--O is negative for one Sear checkpoint ($-0.03$~dB), despite a positive scene mean. After fine-tuning, U exceeds C for eight of the nine Chicken, Cut and Sear checkpoints. P is below C for all nine. These results delimit the advantage of the candidate restriction to the evaluated cold low-budget setting and offer little support for imposing a protected core to improve fine-tuned PSNR. Each adapted checkpoint serves its own 15\% working point.
+
+\begin{table*}[t]
+\centering\small
+\caption{Matched fine-tuning at 15\%, PSNR (dB). Each entry is a mean $\pm$ sample standard deviation over three source checkpoints. The last column summarizes within-checkpoint differences.}
+\label{tab:finetune}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccc}
+\hline
+Scene & O & P & C & U & C--O \\
+\hline
+\resultrows{results_assets/finetune.tex}
+\hline
+\end{tabular}}
+\end{table*}
+
+\input{rescoring}
+\FloatBarrier
+\subsection{Quality relative to the full source}
+\label{sec:full}
+For all four scenes, the archived 100\% renders use every Gaussian from the same source checkpoints used for subset selection. Chicken, Cut and Sear use direct native all-ID renders. Basin uses the archived full-count opacity render from the same evaluation as its cold 25\% subsets. Table~\ref{tab:full} reports the paired gap to those references. At 10\%, C is 1.31--2.37~dB below the full source on the Chicken, Cut and Sear scene means. The gap is 0.69--1.42~dB at 15\% and 0.44--0.90~dB at 25\%. Adapting the 15\% subset reduces the mean gap to 0.01--0.63~dB. Basin has a much smaller full-source gap across the reported working points. At 25\%, mean SSIM decreases by 0.017, 0.016 and 0.013 on Chicken, Cut and Sear, respectively, while mean LPIPS increases by 0.030, 0.015 and 0.010. To express the 15\% results as a working-point choice, we count sources whose mean PSNR is at most 0.5 or 1.0~dB below their full source. After matched adaptation, C meets these descriptive cutoffs on 9/12 and 12/12 sources, respectively, compared with 4/12 and 5/12 for O. The cold gaps measure the effect of subsetting the frozen source. The final column combines subsetting and additional optimization.
+
+\begin{table*}[t]
+\centering\small
+\caption{Full-source PSNR and paired differences (full minus C, dB). Entries show mean $\pm$ sample standard deviation across the same three checkpoints per scene. The 100\% column uses the unpruned source checkpoint.}
+\label{tab:full}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccc}
+\hline
+& & \multicolumn{4}{c}{Full minus C} \\
+Scene & Full (100\%) & Cold 10\% & Cold 15\% & Cold 25\% & Fine-tuned 15\% \\
+\hline
+\resultrows{results_assets/full.tex}
+\hline
+\end{tabular}}
+\end{table*}
+
+\subsection{Rendering latency and profiling}
+\label{sec:runtime}
+We measured synchronous native rendering on one RTX 3090 (PyTorch 2.5.1+cu121, CUDA 12.1), using resident test cameras at the quality-evaluation resolutions. The dynamic path gathers the selected indices from the full source at runtime and uses the deformation network and rasterizer. The compact path uses a materialized subset and runs deformation and rasterization. The measurements exclude model preparation, offline ranking, quality metrics, and file output. We pool frame timings over three traversals of the entire test split within one process for each working point and source. We compute p50 and p95 within that pool, form each method's ratio to O within source, and report the median across sources. These measurements describe resident native rendering. Section~\ref{sec:delivery} reports package sizes and a separate HTTP payload test.
+
+Figure~\ref{fig:cost} shows quality and median frame latency at the five cold budgets. Table~\ref{tab:timing} reports the corresponding latency statistics for the fine-tuned compact subsets. Over the nine Chicken, Cut and Sear sources, the median paired C/O time ratio is 1.021 at p50 and 1.032 at p95, and U/O is 1.029 and 1.047. The C/O p95 ratio reaches 1.116 on Cut, so similar median times can coexist with a larger tail cost. Within a fixed count, methods may still produce different projected footprints and pixel overlap, which affect the rasterizer's workload.
+
+The stage measurements in Table~\ref{tab:profile} use separate synchronization and 12 fixed test cameras for each instrumented working point. At cold dynamic 15\%, deformation medians of 2.36--3.22~ms exceed the gather (0.15--0.18~ms) and raster (0.53--0.78~ms) medians in the illustrated configurations. Those independently instrumented medians describe the size of each stage. Frame latency is measured separately. The persistent deformation cost helps explain why latency does not scale in proportion to the retained Gaussian count in these runs. Increasing cold C retention from 10\% to 25\% increased p50 frame time for all 12 sources on both paths. The median paired increase was 1.246~ms with dynamic gathering and 1.215~ms with a compact subset. On each path, p95 increased for 11 of 12 sources.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.86\textwidth]{results_assets/cost.pdf}
+\caption{Cold PSNR versus measured resident-render latency. Each point combines mean PSNR and the median of the three source-level p50 frame times for the same arm and retained count. Solid lines show dynamic gathering and dashed lines show compact subsets. Lines connect observations in budget order. Dynamic C is annotated at 10, 20, and 35\%.}
+\label{fig:cost}
+\end{figure*}
+
+\begin{table*}[t]
+\centering\small
+\caption{Fine-tuned 15\% compact frame latency. Each entry is the median across three sources of the displayed statistic. The last two columns first form the corresponding latency ratio to O within each source.}
+\label{tab:timing}
+\begin{tabular}{lccccc}
+\hline
+Scene & Arm & p50 (ms) & p95 (ms) & p50/O & p95/O \\
+\hline
+\resultrows{results_assets/timing.tex}
+\hline
+\end{tabular}
+\end{table*}
+
+\begin{table*}[t]
+\centering\small
+\caption{Separately instrumented cold dynamic stages at 15\% for O, C, and U. Entries are medians across sources of stage medians in milliseconds.}
+\label{tab:profile}
+\begin{tabular}{lcccc}
+\hline
+Scene & Arm & Gather & Deformation & Rasterization \\
+\hline
+\resultrows{results_assets/profile.tex}
+\hline
+\end{tabular}
+\end{table*}
+
+\subsection{Comparing two rankings across 13 real scenes at 25\% retention}
+\label{sec:historical}
+Table~\ref{tab:historical} compares opacity and protected-core rankings at 25\% retention across 13 real scenes from three dataset families. Each row uses one source checkpoint and reports the endpoint after 2,000 fine-tuning steps on both opacity (O) and protected-core (P) subsets. P gains in 11 scenes, by at least 0.5~dB in five and at least 1~dB in one. Gains are small in the NeRF-DS scenes and two of those pairs favor O. The C/U comparisons use the separate four-scene, three-source protocol above.
+
+\begin{table*}[t]
+\centering\small
+\caption{Opacity and protected-core rankings at 25\% retention after 2,000 matched fine-tuning steps, with one source per scene. Absolute PSNR and paired differences are in dB.}
+\label{tab:historical}
+\begin{tabular}{llrrr}
+\hline
+Dataset & Scene & O & P & P--O \\
+\hline
+\resultrows{results_assets/historical.tex}
+\hline
+\end{tabular}
+\end{table*}
+
+\subsection{Independent fixed-capacity training}
+\label{sec:capacity}
+We also evaluate a model trained separately for each of two 25\% targets (Chicken and Cut, one source per scene). Each run trains for 33,000 updates with a Gaussian capacity constraint during densification and reaches its target exactly. O, P and C use cold subsets of the corresponding existing source at that identical count. The cold C subset exceeds the matched capacity model by 2.02~dB on Chicken and 0.15~dB on Cut. The independently trained model is 1.92~dB below P on Chicken and 0.10~dB below P on Cut. On Cut, independent training has better SSIM (0.931 versus 0.924 for P), while P has lower LPIPS (0.071 versus 0.089). The independent capacity runs took 910.4 and 938.7 seconds on Chicken and Cut, using full-only supervision plus native regularization. The corresponding reusable sources took 2,159 and 2,226 seconds with full and prefix supervision. Each trained source supplies all five cold budgets from the same weights.
+
+\begin{table*}[t]
+\centering\small
+\caption{Historical 25\% fixed-capacity training control. Each comparison uses the same target count $K$ and matched test views. Training seconds refer to the separately trained capacity model's training loop. Quality is PSNR (dB).}
+\label{tab:capacity}
+\setlength{\tabcolsep}{3pt}\begin{tabular}{lrrrrrr}
+\hline
+Scene & $K$ & Fixed capacity & Cold O & Cold P & Cold C & Train (s) \\
+\hline
+\resultrows{results_assets/capacity.tex}
+\hline
+\end{tabular}
+\end{table*}

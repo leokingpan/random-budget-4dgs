@@ -1,0 +1,308 @@
+[
+  {
+    "scene": "Cut Roasted Beef",
+    "family": "prefix-supervised",
+    "seed": 0,
+    "point_count": 205825,
+    "calibration_indices": [
+      300,
+      610,
+      919,
+      1229,
+      1539,
+      1848,
+      2158,
+      2468,
+      2777,
+      3087,
+      3396,
+      3706,
+      4016,
+      4325,
+      4635,
+      4945,
+      5254,
+      5564,
+      5874,
+      483,
+      793,
+      1103,
+      1412,
+      1722,
+      2031,
+      2341,
+      2651,
+      2960,
+      3270,
+      3580,
+      3889,
+      4199
+    ],
+    "membership_checks": [
+      {
+        "method": "pool100",
+        "budget": 10,
+        "sha256": "3b98d2a9496adef258919801e3284abbffed189887d835204e63b6a10bae546d"
+      },
+      {
+        "method": "pool100",
+        "budget": 15,
+        "sha256": "e612e9d2be6fad896e3a5cf8960e3c515fef02f603caa3749228c135e3c05ccb"
+      },
+      {
+        "method": "pool50",
+        "budget": 10,
+        "sha256": "5432b26da147ad792abaaaa48ca490f4c82a9a9445ea28068b2cf2fcd3000818"
+      },
+      {
+        "method": "pool50",
+        "budget": 15,
+        "sha256": "a396971bb46fd6301e8cb3774200b8e1ee3094bc19dec33bbcd74d05283a1e2d"
+      },
+      {
+        "method": "pool30",
+        "budget": 10,
+        "sha256": "e91c59933ce9c2620941895cd546a063ea169e1eb27dc280a49ad2a1e2c41aa8"
+      },
+      {
+        "method": "pool30",
+        "budget": 15,
+        "sha256": "cb7e6c7f5bb6e2945756653ef26babff196a48b1bada75f06ec83e6e131540ec"
+      },
+      {
+        "method": "pool70",
+        "budget": 10,
+        "sha256": "f139e1b49f0262a13efa547ea7e6d665cc4aa7acef7020a5f7af0725226775f0"
+      },
+      {
+        "method": "pool70",
+        "budget": 15,
+        "sha256": "89d46cd339cf33a112e4e1611a0ff5b297bc0faae1096800163fb87849dfff53"
+      },
+      {
+        "method": "O",
+        "budget": 10,
+        "sha256": "dc5775c18dfea1b791aa37e76b450b746edb2ef2268ad58a5dca4f07f4564033"
+      },
+      {
+        "method": "O",
+        "budget": 15,
+        "sha256": "598c5c9de739f240359ef78d488d9397453c0e1e61a2bb8e00b7318eede99ae5"
+      },
+      {
+        "method": "four",
+        "budget": 10,
+        "sha256": "6db575009475410fac39e4bde250c6aac333fab9c996882dac74374efd6acb09"
+      },
+      {
+        "method": "four",
+        "budget": 15,
+        "sha256": "e98d2e4ad00b7cf1650197f814bc52806544c2e1fabb93a5c9734b50a25c7a5b"
+      }
+    ]
+  },
+  {
+    "scene": "Cut Roasted Beef",
+    "family": "prefix-supervised",
+    "seed": 1,
+    "point_count": 207743,
+    "calibration_indices": [
+      300,
+      610,
+      919,
+      1229,
+      1539,
+      1848,
+      2158,
+      2468,
+      2777,
+      3087,
+      3396,
+      3706,
+      4016,
+      4325,
+      4635,
+      4945,
+      5254,
+      5564,
+      5874,
+      483,
+      793,
+      1103,
+      1412,
+      1722,
+      2031,
+      2341,
+      2651,
+      2960,
+      3270,
+      3580,
+      3889,
+      4199
+    ],
+    "membership_checks": [
+      {
+        "method": "four",
+        "budget": 10,
+        "sha256": "46e921e6c5fe8b6abc3becb10b3b351d91ca80f19de593ec46b0ebb802e70cce"
+      },
+      {
+        "method": "four",
+        "budget": 15,
+        "sha256": "4f3cdeeee6615ca6378f1c0e89104df220a9d5726bd2458211c1a93b96c70030"
+      },
+      {
+        "method": "pool100",
+        "budget": 10,
+        "sha256": "95ea688051a53ba99e92e4c43b2b5f67533bebcffca9e1845a3481aced8151fe"
+      },
+      {
+        "method": "pool100",
+        "budget": 15,
+        "sha256": "b55a76626419b199bf2a12b199d8469c2af78441e2ae60ed5395d39cb270f2f7"
+      },
+      {
+        "method": "pool50",
+        "budget": 10,
+        "sha256": "1dbc8ca96303f9eec7ebe899483a724a6dc9d1e5ff8d0944224b333a713cad03"
+      },
+      {
+        "method": "pool50",
+        "budget": 15,
+        "sha256": "9ace0fac970e1701b1a2ce9c8ede580297b22f801c1bdf212734f22ae1453b92"
+      },
+      {
+        "method": "pool30",
+        "budget": 10,
+        "sha256": "90303541d879b6cc7c78c04d5567a31107f4318e7b121f293af365b0b6188acd"
+      },
+      {
+        "method": "pool30",
+        "budget": 15,
+        "sha256": "16d5f32549679aeb85b488380eb068643b32c3e3f9091f787a9b29dbe798925a"
+      },
+      {
+        "method": "pool70",
+        "budget": 10,
+        "sha256": "ddde05d587d9304f2b741098ea35c827cf7fc1271cadb45b4e43db9bbea1f969"
+      },
+      {
+        "method": "pool70",
+        "budget": 15,
+        "sha256": "d69b839f66faca5f64a72f4eef446f40c39871432446f27de7244ebc0096596b"
+      },
+      {
+        "method": "O",
+        "budget": 10,
+        "sha256": "ae944869f2e8d2b6af274f75077f5374ac201c2c7d1bbc54fb2eaf7f646d528c"
+      },
+      {
+        "method": "O",
+        "budget": 15,
+        "sha256": "b7113939e48e337252259635f1304e2c33be5782fef2af0135bb1d48c79c16c4"
+      }
+    ]
+  },
+  {
+    "scene": "Cut Roasted Beef",
+    "family": "prefix-supervised",
+    "seed": 2,
+    "point_count": 209599,
+    "calibration_indices": [
+      300,
+      610,
+      919,
+      1229,
+      1539,
+      1848,
+      2158,
+      2468,
+      2777,
+      3087,
+      3396,
+      3706,
+      4016,
+      4325,
+      4635,
+      4945,
+      5254,
+      5564,
+      5874,
+      483,
+      793,
+      1103,
+      1412,
+      1722,
+      2031,
+      2341,
+      2651,
+      2960,
+      3270,
+      3580,
+      3889,
+      4199
+    ],
+    "membership_checks": [
+      {
+        "method": "pool100",
+        "budget": 10,
+        "sha256": "1a38b07d70aeb94ffc4821fe7875a686f6a7a9629eee608d751d88ee093b82d3"
+      },
+      {
+        "method": "pool100",
+        "budget": 15,
+        "sha256": "d88595ae36a432eb967a73e3f87605e85ea47b2803a04fbca1d71c342a2c3f2e"
+      },
+      {
+        "method": "pool50",
+        "budget": 10,
+        "sha256": "1c21c8cba83fae55361d359e2323b6baa244fa338d12e6dfc2e93143d441c2d8"
+      },
+      {
+        "method": "pool50",
+        "budget": 15,
+        "sha256": "8e30bcbab67813c27d1a3e9301834abc6ccd6f144cbc9c2ed594ebac355bc241"
+      },
+      {
+        "method": "pool30",
+        "budget": 10,
+        "sha256": "688f5002ce631e2e9545fbfa831a463b9057a8a63c7363d463219331de63e545"
+      },
+      {
+        "method": "pool30",
+        "budget": 15,
+        "sha256": "558046759472267814c3e5b8204d3fa3df94068d1ccb2f871fbcca6fe47a9394"
+      },
+      {
+        "method": "pool70",
+        "budget": 10,
+        "sha256": "093b2b06ff3eb25a989bd3a7ecc9c29a224bbdb36e7737967b0a0424ee748923"
+      },
+      {
+        "method": "pool70",
+        "budget": 15,
+        "sha256": "8f73e37304e04ce59d48982b0ae174713eb0ada22569c69ffba501159b7b5562"
+      },
+      {
+        "method": "O",
+        "budget": 10,
+        "sha256": "eb0dbbe0a954c6bff9ccf40fc579172add6429bf263b0714476e54f4e9b7c95a"
+      },
+      {
+        "method": "O",
+        "budget": 15,
+        "sha256": "dfcf3d01377057d87824eae6fff7eac55d6de7474f32352d4340e8d72bcb8f48"
+      },
+      {
+        "method": "four",
+        "budget": 10,
+        "sha256": "720d9e75246e62f55f78724ed921434925f7d43a78843dd7c4806b032ab135cd"
+      },
+      {
+        "method": "four",
+        "budget": 15,
+        "sha256": "ea5037f132fc3c49a9032e801d79c790fcacce0f85c6690759f6a524307657be"
+      }
+    ]
+  }
+]

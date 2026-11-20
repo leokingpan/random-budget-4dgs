@@ -1,0 +1,15 @@
+\subsection{Model storage and transfer}\label{sec:delivery}
+For each of the 12 sources, we serialized both the complete model and its cold C subset at 15\% retention. Both packages use an uncompressed archive of the native binary point cloud, deformation network, point-indexed deformation table, render settings and canonical point IDs. All 24 archives passed CPU round-trip checks. Removing points reduces the point-indexed payload while preserving the shared deformation network.
+\begin{table}[htbp]
+\centering\small
+\caption{Payload size of complete and 15\% C models in decimal MB. Sizes are scene means over three checkpoints. Savings are the range of within-checkpoint reductions.}\label{tab:delivery}
+\begin{tabular}{lrrr}\toprule
+Scene & Full (MB) & C (MB) & Savings (\%) \\\midrule
+Chicken & 78.15 & 37.08 & 51.3--53.3 \\
+Cut Roasted Beef & 63.26 & 17.88 & 71.6--71.8 \\
+Sear Steak & 59.97 & 17.39 & 70.7--71.4 \\
+Basin & 76.16 & 48.41 & 36.4--36.5 \\\bottomrule
+\end{tabular}
+\end{table}
+For Chicken seed 0 we served both packages over a loopback HTTP connection. The client received 75,314,041 bytes for the full model and 36,659,192 bytes for C, a 51.3\% reduction in response-body bytes. Both received files matched the source SHA-256 digests. This test measures the data to be delivered. Frame timings in Section~\ref{sec:runtime} were measured with the native RTX 3090 renderer.
+At the same cold C 15\% membership and resident test cameras, rendering the materialized subset reduced peak PyTorch-allocated GPU memory by 29.0--47.0~MiB relative to gathering from the full model, across all 12 native RTX 3090 source pairs.

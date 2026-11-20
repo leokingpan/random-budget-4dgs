@@ -1,0 +1,1 @@
+From the study directory, run python replay/check.py with NumPy installed. This checks six memberships and six mean PSNR values against the supplied Cut seed-zero data. It aggregates per-frame measurements; no CUDA renderer is invoked.

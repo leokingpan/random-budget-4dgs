@@ -1,0 +1,18 @@
+\subsection{Ranking within a fixed opacity band}\label{sec:bridge}
+An earlier matched experiment held the opacity core, candidate band, source and count fixed and changed the ordering within the band. The comparators used the opacity--scale product in Eq.~\eqref{eq:legacy-score}, one frozen random order per source, or a feedback-based protected ordering (H). The first two controls isolate the contribution of the ranking within the same band. H also changes the calibration procedure.
+\begin{table}[htbp]
+\centering
+\caption{Effect of changing the ranking within the protected band at 25\% retention. Each entry is the mean paired difference in cold PSNR (P minus comparator, dB) across three sources. Positive values favor P.}\label{tab:scorebridge}
+\begin{tabular}{lrrr}
+\toprule
+Scene & Opacity--scale & Random order & Feedback (H) \\
+\midrule
+Chicken & +3.0496 & +2.6040 & -0.0418 \\
+Cut roasted beef & +2.1925 & +2.4405 & -0.0331 \\
+Sear steak & +2.1149 & +2.2713 & -0.0305 \\
+Basin & +0.0133 & +0.0750 & +0.0003 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+P outperformed the opacity--scale product and the fixed random order on all twelve sources. Feedback yielded higher PSNR than P on eleven. The latter improvement adds an offline cost: on Chicken, Cut roasted beef and Sear steak, the median selection time over three independent processes was 3.22--3.37 times as long for H as for P. Including loading and saving reduced the ratio to 1.49--1.57. These measurements compare the preparation cost of P and H only. Peak allocated memory during selection was higher for P.\par

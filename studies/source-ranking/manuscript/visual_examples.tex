@@ -1,0 +1,10 @@
+\input{score_bridge}
+\subsection{What remains visible at one quarter of the points}\label{sec:visual}
+Figure~\ref{fig:visual} compares the same test view across the observation, the complete source, and three cold subsets. In all three frames, reranking recovers part of the quality lost under opacity truncation. We also compared the central $192\times144$ pixels against ground truth for all nine archived example views (three per scene, seed 0). In the 8-bit images, full-source crop PSNR exceeded cold C crop PSNR in all nine pairs, by 0.047--0.757~dB. The crop measurements quantify local reconstruction error, whereas the labels in the figure describe the entire frame.
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{qualitative.pdf}
+\caption{Matched central crops at 25\% retention. Each row uses seed 0 and the middle of three archived example views (source indices 165, 150, and 150, respectively). Each crop spans the central $192\times144$ native pixels. Values below the renderings give PSNR for the entire corresponding frame. The full-source column uses all points from the same source as the three subsets.}\label{fig:visual}
+\end{figure}
+
+For Press, a separate historical experiment on the protected-core order P contains 487 paired $240\times135$ test frames per seed across three seeds. At 25\% retention the mean full-minus-P PSNR gap is 0.018~dB, while the largest individual frame gap is 0.353~dB. These frame averages characterize the archived Press runs. The original figure used a separate rendering record.

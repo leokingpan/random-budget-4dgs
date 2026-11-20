@@ -1,0 +1,14 @@
+\subsection{Full-capacity comparison with independently trained standard 4DGS}\label{sec:basin_native}
+For Basin, we compared standard 4DGS with the prefix-supervised source at each model's native full count. The three seed pairs shared the same initial point-cloud fingerprint within each pair. Each model received 17,000 training updates. We rendered the same 668 held-out frames at $240\times135$ on one RTX 3090, verified image and camera identities, and measured PSNR in a separate pass. For timing, we warmed up each model, synchronized each frame and alternated model order across three traversals and seeds. Both models rendered all of their primitives directly. Table~\ref{tab:basin_native} summarizes the paired evaluation.
+
+\begin{table}[!htbp]\centering\small\caption{Basin full-capacity comparison. Entries are means over three seeds. Frame-time percentiles are computed within each model over 2,004 synchronized renders. Memory is peak PyTorch allocation. Recorded training-worker time includes startup checks and excludes queue time.}\label{tab:basin_native}\begin{tabular}{lrr}\toprule
+Metric & Standard 4DGS & Prefix-supervised \\\midrule
+Full primitive count & 93,267 & 127,031 \\
+Test PSNR (dB) & 19.728 & 19.631 \\
+Median frame time (ms) & 7.37 & 9.53 \\
+95th-percentile frame time (ms) & 8.58 & 10.69 \\
+Peak allocated memory (MiB) & 218.7 & 279.4 \\
+Training-worker time (s) & 568.7 & 931.9 \\
+\bottomrule\end{tabular}\end{table}
+
+Standard 4DGS and the full prefix-supervised source attained 19.728 and 19.631~dB, respectively. The prefix-supervised source contained 36.2\% more points and its median frame time was 29.3\% higher. At 15\% of this source, cold C used approximately 19,055 points, or 20.4\% of the standard full-model count, and reached 19.63~dB (Table~\ref{tab:cold}). At this same subset count, C exceeded O by 0.09~dB. The first comparison quantifies the quality retained with fewer points. The second isolates the gain due to selection.
