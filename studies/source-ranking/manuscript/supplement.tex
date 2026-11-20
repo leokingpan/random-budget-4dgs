@@ -1,0 +1,62 @@
+\section{Supplementary protocols and controls}\label{sec:supp}
+\subsection{Source-training variants}
+For the earlier submitted training variant, each iteration added prefix supervision with probability 0.5, drawing the fraction uniformly from $[0.1,1]$ on that branch. Section~\ref{sec:method} specifies the discrete schedule for the prefix-supervised sources used in the ranking comparisons.
+\subsection{Validation against physical single-point deletion}
+We compared the predicted RGB mean squared error (MSE) with the change in the display renderer after physically removing one point. For Cut seed zero we used four training observations, stratified by score rank and supplemented with points where C and U disagreed. The matched analysis comprises 96 point--view pairs from 68 distinct canonical point IDs. Every ID in these pairs belongs to the 15\% U subset. Removing the same ID in the full source and in that subset therefore defines both measurements. Each context has 28 pairs with exactly zero measured perturbation. Repeated views of the same point are not independent replicates.
+
+Over all 96 pairs, the pooled Spearman correlation was 0.9985 in the full source. In the reduced context, the full-source score gave 0.9609 and the score recomputed in the subset gave 0.9986. To assess magnitude, among the 68 pairs per context with measured MSE above $10^{-15}$, the median predicted-to-measured ratio was 1.000 in both contexts. The 10th--90th percentile intervals were 0.963--1.007 (full) and 0.959--1.016 (subset). Figure~\ref{fig:deletion_check} shows the individual errors. These comparisons validate single-point perturbations on the sampled views. The PSNR comparisons between complete pruning schedules measure the effect of removing many points together.
+\begin{figure}[htbp]\centering\includegraphics[width=.94\linewidth]{deletion_magnitude.pdf}
+\caption{Predicted and measured MSE in each point's current rendering context. Only pairs with both values positive appear on logarithmic axes. The diagonal denotes equal predicted and measured errors.}\label{fig:deletion_check}\end{figure}
+\subsection{Calibration coverage across time}
+On the prepared scenes, the calibration procedure selects equally spaced ranks among the available training times and cycles among the cameras available at those times. On Cut seed zero, we varied the observation count (8, 16, 32 and 64) and the initial camera offset (0, 6 and 12). At 10\% retention, C yielded 29.765--29.944~dB using eight observations, 30.058--30.138~dB using 32, and 30.075--30.117~dB using 64. Figure~\ref{fig:time_cut} shows the framewise comparison for the original 32 observations.
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{temporal.png}
+\caption{Quality relative to one unrestricted pass, in the temporal order of the 300 held-out Cut frames. Lines show means across three prefix-supervised sources. Shading spans the three source values per frame.}\label{fig:time_cut}\end{figure}
+
+\subsection{Comparing two rankings across 13 real scenes at 25\% retention}
+\label{sec:historical}
+Table~\ref{tab:historical} compares opacity and protected-core rankings at 25\% retention across 13 real scenes from three dataset families. Each row uses one source checkpoint and reports the endpoint after 2,000 fine-tuning steps on both opacity (O) and protected-core (P) subsets. P gains in 11 scenes, by at least 0.5~dB in five and at least 1~dB in one. Gains are small in the NeRF-DS scenes and two of those pairs favor O. Table~\ref{tab:sourcefilter} compares C and U across two source families in eight paired scenes. The budget and adaptation experiments use four prefix-supervised scenes with three sources each.
+
+\begin{table*}[t]
+\centering\small
+\caption{Opacity and protected-core rankings at 25\% retention after 2,000 matched fine-tuning steps, with one source per scene. Absolute PSNR and paired differences are in dB.}
+\label{tab:historical}
+\begin{tabular}{llrrr}
+\hline
+Dataset & Scene & O & P & P--O \\
+\hline
+\resultrows{results_assets/historical.tex}
+\hline
+\end{tabular}
+\end{table*}
+
+\subsection{Independent fixed-capacity training}
+\label{sec:capacity}
+We also evaluate a model trained separately for each of two 25\% targets (Chicken and Cut, one source per scene). Each run trains for 33,000 updates with a Gaussian capacity constraint during densification and reaches its target exactly. O, P and C use cold subsets of the corresponding existing source at that identical count. The cold C subset exceeds the matched capacity model by 2.02~dB on Chicken and 0.15~dB on Cut. The independently trained model is 1.92~dB below P on Chicken and 0.10~dB below P on Cut. On Cut, independent training has better SSIM (0.931 versus 0.924 for P), while P has lower LPIPS (0.071 versus 0.089). The independent capacity runs took 910.4 and 938.7 seconds on Chicken and Cut, using full-only supervision plus native regularization. The corresponding reusable sources took 2,159 and 2,226 seconds with full and prefix supervision. Each trained source supplies all five cold budgets from the same weights.
+
+\begin{table*}[t]
+\centering\small
+\caption{Independent 25\% fixed-capacity training control. Each comparison uses the same target count $K$ and matched test views. Training seconds refer to the separately trained capacity model's training loop. Quality is PSNR (dB).}
+\label{tab:capacity}
+\setlength{\tabcolsep}{3pt}\begin{tabular}{lrrrrrr}
+\hline
+Scene & $K$ & Fixed capacity & Cold O & Cold P & Cold C & Train (s) \\
+\hline
+\resultrows{results_assets/capacity.tex}
+\hline
+\end{tabular}
+\end{table*}
+
+\subsection{Comparison with opacity times scale area}
+For comparison we also evaluate an earlier opacity--scale product. Its implementation uses
+\begin{equation}
+s_i^{\mathrm{legacy}}(t)
+=\operatorname{sigmoid}(\widetilde o_i(t))\,
+s_{ix}^{\mathrm{can}}s_{iy}^{\mathrm{can}},
+\label{eq:legacy-score}
+\end{equation}
+where $\widetilde o_i(t)$ is the opacity logit returned by the deformation module and $s_{ix}^{\mathrm{can}}$ and $s_{iy}^{\mathrm{can}}$ are activated canonical scale components. Opacity deformation is disabled in the archived comparison configurations, so the product is time invariant there. The two scale components are in canonical coordinates. The main comparison uses the rendering-based score in Eq.~\eqref{eq:deletion-score}.
+
+
+\input{visual_examples}
+\input{delivery}
+\input{full_cost}

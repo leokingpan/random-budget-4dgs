@@ -3,16 +3,16 @@
 
 \subsection{Evaluation protocol}
 \label{sec:setup}
-The main evaluation uses Chicken (HyperNeRF VRIG~\cite{park2021hypernerf}), Cut Roasted Beef and Sear Steak (DyNeRF/N3DV~\cite{li2022neuralvideo}), and Basin (NeRF-DS~\cite{yan2023nerf}). We use three existing source checkpoints per scene. The evaluation uses the test split at the resolutions available in the records: $268\times480$ for Chicken (164 frames), $480\times360$ for Cut and Sear (300 frames each), and $240\times135$ for Basin (668 frames). These scenes and test views had been examined in earlier experiments. The three checkpoint replicates quantify sensitivity within each scene under this protocol.
+The source-family comparison pairs ordinary and prefix-supervised checkpoints across eight scenes (Table~\ref{tab:sourcefilter}). We additionally test independent ordinary training runs on three scenes (Table~\ref{tab:ordrep}). For budget sweeps and matched adaptation, we use three prefix-supervised checkpoints per scene on four scenes: Chicken (HyperNeRF VRIG~\cite{park2021hypernerf}, 164 frames at $268\times480$), Cut Roasted Beef and Sear Steak (DyNeRF/N3DV~\cite{li2022neuralvideo}, 300 frames each at $480\times360$), and Basin (NeRF-DS~\cite{yan2023nerf}, 668 frames at $240\times135$). These scenes and test views had been examined previously. The independent runs quantify variation across training seeds within a scene.
 
-For each source and nominal retained fraction, O, P, C and U have identical integer capacity $K$ and use identical test cameras. At each working point we average raw PSNR over frames within each checkpoint, then report the scene mean and sample standard deviation over the three checkpoint values. Paired differences compare methods within each checkpoint before aggregation. All quality cells contain PSNR. Each auxiliary metric (SSIM and LPIPS) is missing for 46 archived Basin cells: ten at 10\% retention and twelve each at 15, 20 and 35\%. We leave these entries missing. At the newly examined 10\% and 20\% budgets, the 96 cold cells include 63 new renders, 24 archived Basin measurements and nine exact membership matches at 10\% (P and O). The 13-scene fine-tuning comparison and the fixed-capacity controls below use independent protocols and are reported separately.
+For each source and nominal retained fraction, O, P, C and U have identical integer capacity $K$ and use identical test cameras. For the four-scene study we average raw PSNR over frames within each checkpoint, then report the scene mean and sample standard deviation over the three checkpoint values. Paired differences compare methods within each checkpoint before aggregation. All quality cells contain PSNR. Each auxiliary metric (SSIM and LPIPS) is missing for 46 archived Basin cells: ten at 10\% retention and twelve each at 15, 20 and 35\%. We leave these entries missing. The source-family comparison, within-scene repeats and supplemental 13-scene P/O study are reported separately.
 
 \input{source_effect}
 \subsection{Budget dependence before fine-tuning}
 \label{sec:cold}
 Table~\ref{tab:cold} and Fig.~\ref{fig:budget} report the same 240 quality cells across five budgets. At 10\%, C improves on opacity ranking (O) by 5.14~dB on Chicken, 2.26~dB on Cut and 1.55~dB on Sear, with improvements above 1~dB for every checkpoint from those three scenes. The respective differences at 15\% are 2.35, 1.85 and 1.06~dB, and at 20\% they narrow to 1.35, 1.45 and 0.76~dB. Basin has a smaller response throughout, with 0.11 and 0.09~dB gains at 10 and 15\%. The absolute values show that the small Basin gain occurs around 19.5~dB in this evaluation.
 
-Comparing C with U isolates the opacity candidate restriction for the same analytic score. At both 10 and 15\%, C scores higher for all nine checkpoints from Chicken, Cut and Sear. At 20\%, C is ahead for two of nine checkpoints, and at 25 and 35\%, U is ahead for all nine. Basin differences between these variants are negligible. P and O select the same members at 10\% because P protects the opacity core at that budget. The separate score comparison in Table~\ref{tab:scorebridge} evaluates historical rankings under a common core and candidate band at 25\%.
+Comparing C with U isolates the opacity candidate restriction for the same analytic score. At both 10 and 15\%, C scores higher for all nine checkpoints from Chicken, Cut and Sear. At 20\%, C is ahead for two of nine checkpoints, and at 25 and 35\%, U is ahead for all nine. Basin differences between these variants are negligible. P and O select the same members at 10\% because P protects the opacity core at that budget. Additional 25\% controls hold the protected core and candidate band fixed (Table~\ref{tab:scorebridge}).
 
 \begin{table*}[t]
 \centering\small
@@ -37,7 +37,7 @@ Scene & Budget (\%) & O & P & C & U \\
 
 \subsection{Ranking choice after matched fine-tuning at 15\%}
 \label{sec:finetune}
-For every source and ranking, we materialize the selected members at 15\% and apply 2,000 optimizer updates using common optimizer settings and the same training-camera schedule. Each run uses Adam to minimize $0.8L_1+0.2(1-\mathrm{SSIM})$ on training images, updating the retained point parameters and trainable deformation parameters. The endpoint is fixed in advance and test PSNR plays no part in choosing it. The membership remains fixed, with densification and member replacement disabled. The step-zero evaluations reproduce the archived cold per-frame PSNR with a maximum absolute deviation of $7.11\times10^{-15}$~dB. Table~\ref{tab:finetune} reports the fixed step-2,000 endpoint. Opacity subsets also benefit from the matched adaptation. The C--O gap remains positive for every Chicken, Cut and Sear checkpoint and exceeds 1~dB in all six Chicken and Cut pairs. U--O is negative for one Sear checkpoint ($-0.03$~dB), despite a positive scene mean. After fine-tuning, U exceeds C for eight of the nine Chicken, Cut and Sear checkpoints. P is below C for all nine. These results delimit the advantage of the candidate restriction to the evaluated cold low-budget setting and offer little support for imposing a protected core to improve fine-tuned PSNR. Each adapted checkpoint serves its own 15\% working point.
+For every source and ranking, we materialize the selected members at 15\% and apply 2,000 optimizer updates using common optimizer settings and the same training-camera schedule. Each run uses Adam to minimize $0.8L_1+0.2(1-\mathrm{SSIM})$ on training images, updating the retained point parameters and trainable deformation parameters. The endpoint is fixed in advance and test PSNR plays no part in choosing it. The membership remains fixed, with densification and member replacement disabled. The step-zero evaluations reproduce the archived cold per-frame PSNR with a maximum absolute deviation of $7.11\times10^{-15}$~dB. Table~\ref{tab:finetune} reports the fixed step-2,000 endpoint. Opacity subsets also benefit from the matched adaptation. The C--O gap remains positive for every Chicken, Cut and Sear checkpoint and exceeds 1~dB in all six Chicken and Cut pairs. U--O is negative for one Sear checkpoint ($-0.03$~dB), despite a positive scene mean. After fine-tuning, U exceeds C for eight of the nine Chicken, Cut and Sear checkpoints. P is below C for all nine. In Table~\ref{tab:finetune}, paired U minus C averages $+0.171$~dB on Chicken and $+0.566$~dB on Cut. On Sear the mean is $+0.002$~dB; its paired sample standard deviation, $0.452$~dB, reflects opposing changes across seeds. On Basin the mean difference is below 0.001~dB. Each adapted checkpoint serves its own 15\% working point.
 
 \begin{table*}[t]
 \centering\small
@@ -46,7 +46,7 @@ For every source and ranking, we materialize the selected members at 15\% and ap
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{lccccc}
 \hline
-Scene & O & P & C & U & C--O \\
+Scene & O & P & C & U & U--C \\
 \hline
 \resultrows{results_assets/finetune.tex}
 \hline
@@ -111,40 +111,6 @@ Scene & Arm & p50 (ms) & p95 (ms) & p50/O & p95/O \\
 Scene & Arm & Gather & Deformation & Rasterization \\
 \hline
 \resultrows{results_assets/profile.tex}
-\hline
-\end{tabular}
-\end{table*}
-
-\subsection{Comparing two rankings across 13 real scenes at 25\% retention}
-\label{sec:historical}
-Table~\ref{tab:historical} compares opacity and protected-core rankings at 25\% retention across 13 real scenes from three dataset families. Each row uses one source checkpoint and reports the endpoint after 2,000 fine-tuning steps on both opacity (O) and protected-core (P) subsets. P gains in 11 scenes, by at least 0.5~dB in five and at least 1~dB in one. Gains are small in the NeRF-DS scenes and two of those pairs favor O. The C/U comparisons use the separate four-scene, three-source protocol above.
-
-\begin{table*}[t]
-\centering\small
-\caption{Opacity and protected-core rankings at 25\% retention after 2,000 matched fine-tuning steps, with one source per scene. Absolute PSNR and paired differences are in dB.}
-\label{tab:historical}
-\begin{tabular}{llrrr}
-\hline
-Dataset & Scene & O & P & P--O \\
-\hline
-\resultrows{results_assets/historical.tex}
-\hline
-\end{tabular}
-\end{table*}
-
-\subsection{Independent fixed-capacity training}
-\label{sec:capacity}
-We also evaluate a model trained separately for each of two 25\% targets (Chicken and Cut, one source per scene). Each run trains for 33,000 updates with a Gaussian capacity constraint during densification and reaches its target exactly. O, P and C use cold subsets of the corresponding existing source at that identical count. The cold C subset exceeds the matched capacity model by 2.02~dB on Chicken and 0.15~dB on Cut. The independently trained model is 1.92~dB below P on Chicken and 0.10~dB below P on Cut. On Cut, independent training has better SSIM (0.931 versus 0.924 for P), while P has lower LPIPS (0.071 versus 0.089). The independent capacity runs took 910.4 and 938.7 seconds on Chicken and Cut, using full-only supervision plus native regularization. The corresponding reusable sources took 2,159 and 2,226 seconds with full and prefix supervision. Each trained source supplies all five cold budgets from the same weights.
-
-\begin{table*}[t]
-\centering\small
-\caption{Historical 25\% fixed-capacity training control. Each comparison uses the same target count $K$ and matched test views. Training seconds refer to the separately trained capacity model's training loop. Quality is PSNR (dB).}
-\label{tab:capacity}
-\setlength{\tabcolsep}{3pt}\begin{tabular}{lrrrrrr}
-\hline
-Scene & $K$ & Fixed capacity & Cold O & Cold P & Cold C & Train (s) \\
-\hline
-\resultrows{results_assets/capacity.tex}
 \hline
 \end{tabular}
 \end{table*}

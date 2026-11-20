@@ -1,0 +1,13 @@
+\paragraph{Independent ordinary training runs.}
+We repeated the comparison on three scenes selected from Table~\ref{tab:sourcefilter} to span different seed-zero gaps at 10\%: Broom (largest), Chicken (intermediate) and Flame Steak (smallest). These are within-scene training repeats. We evaluated an existing second Broom checkpoint and trained Chicken and Flame Steak from initialization with a second seed. Each run used the original ordinary scene configuration, 3,000 coarse and 30,000 fine updates, with prefix supervision disabled. The seed pairs shared prepared data, 32 training-only calibration observations, held-out frames and budget rules. Each checkpoint was evaluated at its own native count and at both fixed fractions. Table~\ref{tab:ordrep} gives individual paired effects; the public archive gives absolute full/O/C/U values and individual frame measurements.
+
+\begin{table}[!htbp]\centering\small
+\caption{Ordinary 4DGS training repeats. Each cell is U minus C in mean held-out frame PSNR (dB) for one independently trained checkpoint. Both orders retain exactly the same number of primitives within a cell.}\label{tab:ordrep}
+\begin{tabular}{lrrrr}\toprule
+ & \multicolumn{2}{c}{10\% retention} & \multicolumn{2}{c}{15\% retention}\\
+Scene & Seed 0 & Seed 1 & Seed 0 & Seed 1 \\\midrule
+Broom & +5.820 & +4.211 & +6.973 & +4.923 \\
+Chicken & +1.742 & +2.097 & +2.830 & +3.351 \\
+Flame Steak & +0.001 & +0.770 & +0.187 & +1.072 \\
+\bottomrule\end{tabular}\end{table}
+For the second ordinary Broom, Chicken and Flame Steak sources, U minus C was +4.211, +2.097 and +0.770~dB at 10\% retention, respectively. At 15\%, the corresponding differences were +4.923, +3.351 and +1.072~dB.
