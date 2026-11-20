@@ -28,3 +28,17 @@ For a loaded dynamic Gaussian model, its list of calibration camera/time observa
 The highest-PSNR candidate width on Cut is a descriptive comparison. Training settings and point counts also differ between the two source families. The paired scene study does not isolate a causal effect of prefix supervision.
 
 The release kernel and adapter were rebuilt with PyTorch 2.5.1+cu121 and tested on an RTX 3090. For Cut seed zero the fresh C, U and four-pass runs exactly reproduced all six archived membership hashes for 10% and 15% retention. They require the complete trained checkpoint and the original calibration camera tensors. The CPU check above can be run from this repository alone.
+
+## Ordinary 4DGS training repeats
+
+The ordinary-source repeat study covers Broom, Chicken and Flame Steak, chosen to span a large, intermediate and near-zero seed-zero filtering effect at 10% retention. It reuses the completed ordinary Broom seed 1 and trains Chicken and Flame Steak seed 1 from initialization. Each pair uses the same scene configuration, prepared data, train-only calibration observations and held-out frames. Training runs for 3,000 coarse and 30,000 fine updates with prefix supervision disabled. Seed 0 and seed 1 are distinct training runs. Both targets use 32 calibration observations and the same 50% opacity eligibility rule for C.
+
+Run `python3 data/ordinary_repeats/verify.py` from this directory (Python standard library). It checks all 42 source/arm/budget means and the point counts, verifies matched frame identities and prints U minus C per seed. The files in `data/ordinary_repeats/` include:
+
+- `summary.csv` with full-source and O/C/U PSNR at 10% and 15%, counts, test-frame counts and sorted membership fingerprints.
+- Six per-frame CSVs with the held-out source index and PSNR for every render.
+- `sources.json` with checkpoint-component, dataset-manifest and test-order fingerprints plus the calibration indices.
+- `training_configuration.json` with scene-specific training overrides; the model and dataset locations are supplied locally.
+- `broom_frame.json` recording the middle test-frame choice for the ordinary seed-zero 10% example.
+
+Both CPU checkers operate on saved scores or saved measurements. Rendering new images requires the trained checkpoint, the matching scene/camera loader and prepared images, and compatible GPU deformation and CUDA rasterization code. This archive does not include the six trained models. The manuscript distinguishes the eight-scene seed-zero comparison from these three within-scene repeats.

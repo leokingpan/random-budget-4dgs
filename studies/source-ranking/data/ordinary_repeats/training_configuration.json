@@ -1,0 +1,172 @@
+{
+  "vrig_broom": {
+    "ModelParams": {
+      "white_background": false,
+      "data_device": "cuda",
+      "eval": true,
+      "sh_degree": 3
+    },
+    "ModelHiddenParams": {
+      "kplanes_config": {
+        "grid_dimensions": 2,
+        "input_coordinate_dim": 4,
+        "output_coordinate_dim": 16,
+        "resolution": [
+          64,
+          64,
+          64,
+          150
+        ]
+      },
+      "multires": [
+        1,
+        2,
+        4
+      ],
+      "defor_depth": 1,
+      "net_width": 128,
+      "plane_tv_weight": 0.0002,
+      "time_smoothness_weight": 0.001,
+      "l1_time_planes": 0.0001,
+      "no_do": true,
+      "no_dshs": true,
+      "no_ds": false,
+      "render_process": false
+    },
+    "OptimizationParams": {
+      "iterations": 30000,
+      "coarse_iterations": 3000,
+      "dataloader": true,
+      "batch_size": 2,
+      "densify_until_iter": 10000,
+      "opacity_reset_interval": 300000,
+      "render_process": false
+    },
+    "mgs_enabled": false,
+    "mgs_ratio": 0.0,
+    "port": 0,
+    "test_iterations": [
+      30000
+    ],
+    "save_iterations": [
+      30000
+    ],
+    "checkpoint_iterations": [
+      15000,
+      30000
+    ]
+  },
+  "vrig_chicken": {
+    "ModelParams": {
+      "white_background": false,
+      "data_device": "cuda",
+      "eval": true,
+      "sh_degree": 3
+    },
+    "ModelHiddenParams": {
+      "kplanes_config": {
+        "grid_dimensions": 2,
+        "input_coordinate_dim": 4,
+        "output_coordinate_dim": 16,
+        "resolution": [
+          64,
+          64,
+          64,
+          150
+        ]
+      },
+      "multires": [
+        1,
+        2,
+        4
+      ],
+      "defor_depth": 1,
+      "net_width": 128,
+      "plane_tv_weight": 0.0002,
+      "time_smoothness_weight": 0.001,
+      "l1_time_planes": 0.0001,
+      "no_do": true,
+      "no_dshs": true,
+      "no_ds": false,
+      "render_process": false
+    },
+    "OptimizationParams": {
+      "iterations": 30000,
+      "coarse_iterations": 3000,
+      "dataloader": true,
+      "batch_size": 2,
+      "densify_until_iter": 10000,
+      "opacity_reset_interval": 300000,
+      "render_process": false
+    },
+    "mgs_enabled": false,
+    "mgs_ratio": 0.0,
+    "port": 0,
+    "test_iterations": [
+      30000
+    ],
+    "save_iterations": [
+      30000
+    ],
+    "checkpoint_iterations": [
+      15000,
+      30000
+    ]
+  },
+  "flame_steak": {
+    "ModelParams": {
+      "white_background": false,
+      "data_device": "cuda",
+      "eval": true,
+      "sh_degree": 3
+    },
+    "ModelHiddenParams": {
+      "kplanes_config": {
+        "grid_dimensions": 2,
+        "input_coordinate_dim": 4,
+        "output_coordinate_dim": 16,
+        "resolution": [
+          64,
+          64,
+          64,
+          150
+        ]
+      },
+      "multires": [
+        1,
+        2
+      ],
+      "defor_depth": 0,
+      "net_width": 128,
+      "plane_tv_weight": 0.0002,
+      "time_smoothness_weight": 0.001,
+      "l1_time_planes": 0.0001,
+      "no_do": false,
+      "no_dshs": false,
+      "no_ds": false,
+      "render_process": false
+    },
+    "OptimizationParams": {
+      "iterations": 30000,
+      "coarse_iterations": 3000,
+      "dataloader": true,
+      "batch_size": 4,
+      "densify_until_iter": 10000,
+      "opacity_reset_interval": 60000,
+      "render_process": false
+    },
+    "mgs_enabled": false,
+    "mgs_ratio": 0.0,
+    "port": 0,
+    "test_iterations": [
+      30000
+    ],
+    "save_iterations": [
+      30000
+    ],
+    "checkpoint_iterations": [
+      15000,
+      30000
+    ]
+  }
+}
