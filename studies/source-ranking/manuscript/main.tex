@@ -12,6 +12,8 @@
 
 
 \makeatletter
+% Keep run-in headings directly beneath their parent in the PDF outline.
+\newcommand{\runinheading}[2]{\def\toclevel@paragraph{#1}\paragraph{#2}}
 \def\resultrows#1{\@@input #1 }
 \let\headerps@out\@empty
 \makeatother
@@ -73,10 +75,10 @@ We compare two ways to use the same single-removal influence score on an already
 The clearest distinction emerged when we applied the two rules to different trained representations of the same eight scenes. At both low budgets, the direction of the C--U difference reversed between the available prefix-supervised and ordinary sources. Within the prefix-supervised family, we tested whether this ordering persisted as the budget grew and after equal fine-tuning. We also compared one-pass filtering with recomputing scores as the compositing context changes. Separate capacity controls, native renderer measurements and package sizes address what those quality differences cost in practice.
 
 \section{Related Work}
-\paragraph{Dynamic Gaussian rendering.}
+\runinheading{2}{Dynamic Gaussian rendering.}
 3D Gaussian Splatting models appearance with anisotropic primitives that are depth ordered and alpha composited~\cite{kerbl20233d}. Dynamic Gaussian models use persistent primitives, deform canonical Gaussians, or model space and time directly~\cite{luiten2024dynamic,wu20244d,yang2024deformable,li2024spacetime,duan20244d}. We use the canonical Gaussian and time-conditioned deformation formulation of Wu et al.~\cite{wu20244d}, which uses plane-factorized features related to HexPlane~\cite{cao2023hexplane}. Scores computed from rendered observations can reflect changes in projected coverage and occlusion over time.
 
-\paragraph{Nested budgets and pruning.}
+\runinheading{2}{Nested budgets and pruning.}
 Matryoshka Gaussian Splatting (MGS)~\cite{guo2026matryoshka} trains a static model with stochastic prefix and full-set supervision and uses descending opacity to construct nested prefixes. We apply opacity ranking to both ordinary 4DGS checkpoints and checkpoints trained with a local adaptation of this prefix-supervision principle. Each comparison of selection rules uses one frozen source. Pruning and compression studies also consider primitive importance and representation size~\cite{fan2024lightgaussian,niedermayr2024compressed,navaneet2024compgs}. The single-removal color perturbation follows the alpha-compositing identity underlying GaussianPOP~\cite{lee2026gaussianpop}, which applies analytical error estimates to static Gaussian simplification and also studies iterative rescoring. We aggregate this perturbation over time-conditioned observations and examine a fixed ranking with and without an opacity filter.
 
 \section{Method}\label{sec:method}
@@ -122,7 +124,7 @@ Filtering and rescoring change different decisions. Filtering changes which poin
 
 Absolute quality puts the ranking gains in perspective. On ordinary Chicken at 10\%, opacity truncation gives 9.830~dB, unrestricted influence gives 21.421~dB and the full source gives 31.097~dB. Changing the order recovers 11.591~dB at the same point count, while the full source retains a 9.676~dB advantage over U. On Basin, the 15\% subset approaches full-source quality and changing its order adds only about 0.09~dB over opacity. The first comparison quantifies the value of selection under a severe constraint. The second shows that a good low-budget image can also come from a source where ranking makes little difference.
 
-\paragraph{Choosing a ranking for a new checkpoint.}
+\runinheading{2}{Choosing a ranking for a new checkpoint.}
 For direct rendering at 10--15\%, our paired results motivate trying U first on ordinary sources resembling those tested and C alongside U on prefix-supervised sources. A larger prefix or planned adaptation changes that choice: on Chicken, Cut and Sear, U led across the three prefix-supervised replicates at 25--35\% and in eight of nine comparisons after 15\% fine-tuning. For a new checkpoint, reserve validation cameras and timestamps before inspecting test quality. Compare O, C and U at the intended count, using the same validation frames and the intended adaptation schedule. If repeated scoring is affordable, include it with both its validation quality and its one-time preparation time. Freeze the choice before the final test. For near ties, inspect paired differences by validation camera and time interval before assigning a preference. For new training pipelines and untested budgets, these comparisons provide starting candidates; the validation comparison determines the choice.
 
 \section{Conclusion}\label{sec:conclusion}

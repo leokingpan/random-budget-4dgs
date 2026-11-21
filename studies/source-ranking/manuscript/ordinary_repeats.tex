@@ -1,4 +1,4 @@
-\paragraph{Independent ordinary training runs.}
+\runinheading{3}{Independent ordinary training runs.}
 We repeated the comparison on three scenes selected from Table~\ref{tab:sourcefilter} to span different seed-zero gaps at 10\%: Broom (largest), Chicken (intermediate) and Flame Steak (smallest). These are within-scene training repeats. We evaluated an existing second Broom checkpoint and trained Chicken and Flame Steak from initialization with a second seed. Each run used the original ordinary scene configuration, 3,000 coarse and 30,000 fine updates, with prefix supervision disabled. The seed pairs shared prepared data, 32 training-only calibration observations, held-out frames and budget rules. Each checkpoint was evaluated at its own native count and at both fixed fractions. Table~\ref{tab:ordrep} gives individual paired effects; the public archive gives absolute full/O/C/U values and individual frame measurements.
 
 \begin{table}[!htbp]\centering\small
